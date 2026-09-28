@@ -1,0 +1,1 @@
+/home/tom/github/if-uri/process-uri-rs/target/release/libprocess_uri.rlib: /home/tom/github/if-uri/process-uri-rs/src/gbnf.rs /home/tom/github/if-uri/process-uri-rs/src/lib.rs /home/tom/github/if-uri/process-uri-rs/src/nl2uri.rs /home/tom/github/if-uri/process-uri-rs/src/registry.rs /home/tom/github/if-uri/process-uri-rs/src/uri.rs
