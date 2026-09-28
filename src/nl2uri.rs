@@ -1,7 +1,7 @@
 use crate::uri::ProcessUri;
 use std::collections::BTreeMap;
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone, serde::Serialize, serde::Deserialize)]
 pub enum NlIntent {
     StopLoop,
     StartLoop,

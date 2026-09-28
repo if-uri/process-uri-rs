@@ -5,6 +5,14 @@ edition = "2021"
 description = "Fast RFC 3986 Process URI / Resource URN parser, registry, and GBNF grammar generator for LLMs"
 license = "Apache-2.0"
 
+[lib]
+name = "process_uri"
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "process-uri"
+path = "src/main.rs"
+
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
