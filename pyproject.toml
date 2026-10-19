@@ -1,0 +1,17 @@
+[build-system]
+requires = ["maturin>=1.5,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "process-uri"
+version = "0.1.0"
+description = "High-performance Rust Process URI / URN parser, NL-to-URI dispatcher, System-1 calibrated router, and GBNF grammar generator"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Tom Sapletta", email = "tom@sapletta.com" }]
+
+[tool.maturin]
+python-source = "python"
+module-name = "process_uri.process_uri_rs"
+features = ["extension-module"]

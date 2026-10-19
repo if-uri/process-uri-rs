@@ -1,7 +1,7 @@
 use std::env;
 use std::process;
 
-use process_uri::{dispatch_nl_to_uri, export_gbnf, parse_uri_json_line, ProcessUriRegistry};
+use process_uri_rs::{dispatch_nl_to_uri, export_gbnf, parse_uri_json_line, ProcessUriRegistry};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
