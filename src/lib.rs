@@ -15,7 +15,7 @@ pub use router_engine::{
     evaluate_decision_choice, score_bindings_calibrated, score_candidate_calibrated,
     tokenize_calibrated, tokenize_decision,
 };
-pub use uri::{parse_uri_json_line, ProcessUri, ProcessUriError};
+pub use uri::{parse_jsonl_records, parse_uri_json_line, uri, ProcessUri, ProcessUriError};
 
 #[cfg(feature = "python")]
 mod py_ext {
@@ -56,6 +56,15 @@ mod py_ext {
             "payload": payload,
         });
         serde_json::to_string(&out).map_err(|e| PyValueError::new_err(e.to_string()))
+    }
+
+    #[pyfunction]
+    fn parse_jsonl_fast(payload: &str) -> PyResult<(String, bool)> {
+        let (records, is_batch) =
+            parse_jsonl_records(payload).map_err(PyValueError::new_err)?;
+        let json_str =
+            serde_json::to_string(&records).map_err(|e| PyValueError::new_err(e.to_string()))?;
+        Ok((json_str, is_batch))
     }
 
     #[pyfunction]
@@ -112,6 +121,7 @@ mod py_ext {
     pub fn process_uri_rs(m: &Bound<'_, PyModule>) -> PyResult<()> {
         m.add_function(wrap_pyfunction!(parse_uri_json, m)?)?;
         m.add_function(wrap_pyfunction!(parse_uri_line_json, m)?)?;
+        m.add_function(wrap_pyfunction!(parse_jsonl_fast, m)?)?;
         m.add_function(wrap_pyfunction!(dispatch_nl_json, m)?)?;
         m.add_function(wrap_pyfunction!(tokenize_calibrated_fast, m)?)?;
         m.add_function(wrap_pyfunction!(tokenize_decision_fast, m)?)?;

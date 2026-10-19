@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import json
-from typing import Any
+from pathlib import Path
+import sys
+from typing import Any, Iterable
 
 try:
     from .process_uri_rs import (
         dispatch_nl_json as _rs_dispatch_nl_json,
         evaluate_decision_choice_json as _rs_evaluate_decision_choice_json,
+        parse_jsonl_fast as _rs_parse_jsonl_fast,
         parse_uri_json as _rs_parse_uri_json,
         parse_uri_line_json as _rs_parse_uri_line_json,
         score_bindings_calibrated_json as _rs_score_bindings_calibrated_json,
@@ -33,6 +36,14 @@ def parse_uri_line(line: str) -> tuple[dict[str, Any], Any]:
     if HAS_RUST_PROCESS_URI:
         data = json.loads(_rs_parse_uri_line_json(line))
         return data["uri"], data["payload"]
+    raise RuntimeError("process_uri_rs native extension is not available")
+
+
+def parse_jsonl_fast(payload: str) -> tuple[list[dict[str, Any]], bool]:
+    """Parse a single JSON object or multiline JSONL string in native Rust."""
+    if HAS_RUST_PROCESS_URI:
+        raw_json, is_batch = _rs_parse_jsonl_fast(payload)
+        return json.loads(raw_json), bool(is_batch)
     raise RuntimeError("process_uri_rs native extension is not available")
 
 
@@ -89,13 +100,39 @@ def evaluate_decision_choice(
     raise RuntimeError("process_uri_rs native extension is not available")
 
 
+def _load_dockuri_uri() -> Any:
+    try:
+        import dockuri_uri
+        return dockuri_uri
+    except ImportError:
+        cand = Path.home() / "github" / "dockuri" / "dockuri" / "python"
+        if cand.is_dir() and str(cand) not in sys.path:
+            sys.path.insert(0, str(cand))
+        import dockuri_uri
+        return dockuri_uri
+
+
+def uri(address: str, payload: Any = None, **kwargs: Any) -> Any:
+    """Universal `uri('<full-uri>', [payload_or_jsonl])` caller backed by `dockuri_uri`."""
+    return _load_dockuri_uri().uri(address, payload, **kwargs)
+
+
+def uri_jsonl(address: str, lines: Iterable[str | dict[str, Any]], **kwargs: Any) -> list[dict[str, Any]]:
+    """Stream JSONL lines or dicts into a `dockuri` URI process."""
+    return _load_dockuri_uri().uri_jsonl(address, lines, **kwargs)
+
+
 __all__ = [
     "HAS_RUST_PROCESS_URI",
     "dispatch_nl",
     "evaluate_decision_choice",
+    "parse_jsonl_fast",
     "parse_uri",
     "parse_uri_line",
     "score_bindings_calibrated",
     "tokenize_calibrated_fast",
     "tokenize_decision_fast",
+    "uri",
+    "uri_jsonl",
 ]
+
